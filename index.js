@@ -8,7 +8,6 @@ const db = require('./config/dbconn');
 const { compare, hash } = require('bcrypt');
 const { stringify } = require('querystring');
 const jwt = require('jsonwebtoken');
-const localStorage = require('localStorage');
 const cp = require('cookie-parser');
 
 // _______________

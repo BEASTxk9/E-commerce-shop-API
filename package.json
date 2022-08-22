@@ -25,5 +25,8 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {},
-  "description": ""
+  "description": "",
+  "engines": {
+    "node": "18.6.0"
+  }
 }

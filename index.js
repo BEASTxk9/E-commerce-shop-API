@@ -80,7 +80,6 @@ db.connect( (err) => {
     }
 });
 
-
 // REGISTER & LOGIN
 
 // register

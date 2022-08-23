@@ -48,17 +48,17 @@ app.use(cors({
 // NAV ROUTER
 
 // home
-router.get('/', (req, res) => {
+router.get('/hometest', (req, res) => {
     res.status(200).sendFile('./views/index.html', {root:__dirname} );
 });
 
 // login
-router.get('/login', (req, res) => {
+router.get('/logintest', (req, res) => {
     res.status(200).sendFile('./views/login.html', {root:__dirname} );
 });
 
 // register
-router.get('/register', (req, res) => {
+router.get('/registertest', (req, res) => {
     res.status(200).sendFile('./views/register.html', {root:__dirname} );
 });
 

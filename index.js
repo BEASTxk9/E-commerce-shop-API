@@ -261,8 +261,7 @@ app.post('/login', bodyParser.json(), async(req, res) => {
     } catch(e){
         console.log(`FROM LOGIN ${e.message}.`);
         res.send(`
-        ${e.message}.<br>
-        <a href="/login">Go Back.</a>
+        ${e.message}
         `)
     }
 });

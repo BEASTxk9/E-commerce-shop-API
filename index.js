@@ -142,7 +142,7 @@ router.get('/products', (req, res) => {
 router.get('/products/:id', (req, res) => {
      // mysql query
      const strQry = `
-     SELECT * from products where Product_id = ?;
+     SELECT * from products where Prod_id = ?;
      `;
 
       // error controll
@@ -161,7 +161,7 @@ app.delete("/products/:id", (req, res) => {
     // QUERY
     const strQry = `
     DELETE FROM products
-    WHERE Product_id = ?;
+    WHERE Prod_id = ?;
     ALTER TABLE products AUTO_INCREMENT = 1;
     `;
     db.query(strQry, [req.params.id], (err, data) => {
@@ -174,7 +174,7 @@ app.delete("/products/:id", (req, res) => {
 router.put("/products/:id", bodyParser.json(), async (req, res) => {
     const { Prod_name, category, price, description, img1, img2, dateAdded } = req.body;
     // mySQL query
-    let sql = `UPDATE products SET ? WHERE Product_id = ${req.params.id} `;
+    let sql = `UPDATE products SET ? WHERE Prod_id = ${req.params.id} `;
 
     const product = {
         Prod_name, category, price, description, img1, img2, dateAdded

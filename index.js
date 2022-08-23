@@ -212,8 +212,7 @@ app.post('/register', bodyParser.json(), async(req, res) => {
                 if(err) {
                     console.log(err);
                     res.send(`
-                    <h1>${err}.</h1><br>
-                    <a href="/registertest">Go Back.</a>
+                    ${err}
                     `)
                 } else{
                     console.log(results);

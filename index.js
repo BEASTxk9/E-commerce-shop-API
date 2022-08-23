@@ -80,6 +80,114 @@ db.connect( (err) => {
     }
 });
 
+
+//   PRODUCTS
+
+// create products
+app.post('/products', bodyParser.json(), 
+    (req, res)=> {
+    try{
+        
+       const {Prod_name, category, price, description, img1, img2, dateAdded} = req.body;
+      
+     //     // mySQL query
+    const strQry = 
+    `
+    INSERT INTO products (Prod_name, category, price, description, img1, img2, dateAdded) values (?, ?, ?, ?, ?, ? , NOW())
+    `;
+        //
+        db.query(strQry, 
+            [Prod_name, category, price, description, img1, img2, dateAdded],
+            (err, results)=> {
+                if(err){
+console.log(err);
+res.send(
+                `
+               <h1>${err}.</h1><br>
+                <a href="/products1">Go back...</a>
+                `);
+                } else{
+                    res.send(`
+                    number of affected row/s: ${results.affectedRows} <br>
+                    <a href="/products">Go Back...</a>
+                    `);
+                }
+              
+            })
+    }catch(e) {
+        console.log(`Create a new product: ${e.message}`);
+    }
+});
+
+// get all products
+router.get('/products', (req, res) => {
+    // mysql query
+    const strQry = `
+    SELECT * from products;
+    `;
+
+    // error controll
+    db.query(strQry, (err, results) => {
+        if(err) throw err;
+        res.json({
+            status: 200,
+            results: results
+        })
+        console.log(err)
+    })
+
+});
+
+// get 1 product
+router.get('/products/:id', (req, res) => {
+     // mysql query
+     const strQry = `
+     SELECT * from products where Product_id = ?;
+     `;
+
+      // error controll
+    db.query(strQry, [req.params.id], (err, results) => {
+        if(err) throw err;
+        res.json({
+            status: 200,
+            results: (results.length <= 0) ? 'Sorry no product was found.' : results
+        })
+    });
+
+});
+
+// Delete product
+app.delete("/products/:id", (req, res) => {
+    // QUERY
+    const strQry = `
+    DELETE FROM products
+    WHERE Product_id = ?;
+    ALTER TABLE products AUTO_INCREMENT = 1;
+    `;
+    db.query(strQry, [req.params.id], (err, data) => {
+        if (err) throw err;
+        res.send(`${data.affectedRows} PRODUCT/S WAS DELETED`);
+    });
+});
+
+// Update product
+router.put("/products/:id", bodyParser.json(), async (req, res) => {
+    const { Prod_name, category, price, description, img1, img2, dateAdded } = req.body;
+    // mySQL query
+    let sql = `UPDATE products SET ? WHERE Product_id = ${req.params.id} `;
+
+    const product = {
+        Prod_name, category, price, description, img1, img2, dateAdded
+    };
+
+    db.query(sql, product, (err) => {
+      if (err) throw err;
+      res.json({
+        msg: "Updated Item Successfully",
+      });
+    });
+  });
+
 // REGISTER & LOGIN
 
 // register
@@ -233,112 +341,5 @@ router.put("/users/:id", bodyParser.json(), async (req, res) => {
             msg: "Updated user Successfully",
           });
       }
-    });
-  });
-
-//   PRODUCTS
-
-// create products
-app.post('/products', bodyParser.json(), 
-    (req, res)=> {
-    try{
-        
-       const {Prod_name, category, price, description, img1, img2, dateAdded} = req.body;
-      
-     //     // mySQL query
-    const strQry = 
-    `
-    INSERT INTO products (Prod_name, category, price, description, img1, img2, dateAdded) values (?, ?, ?, ?, ?, ? , NOW())
-    `;
-        //
-        db.query(strQry, 
-            [Prod_name, category, price, description, img1, img2, dateAdded],
-            (err, results)=> {
-                if(err){
-console.log(err);
-res.send(
-                `
-               <h1>${err}.</h1><br>
-                <a href="/products1">Go back...</a>
-                `);
-                } else{
-                    res.send(`
-                    number of affected row/s: ${results.affectedRows} <br>
-                    <a href="/products">Go Back...</a>
-                    `);
-                }
-              
-            })
-    }catch(e) {
-        console.log(`Create a new product: ${e.message}`);
-    }
-});
-
-// get all products
-router.get('/products', (req, res) => {
-    // mysql query
-    const strQry = `
-    SELECT * from products;
-    `;
-
-    // error controll
-    db.query(strQry, (err, results) => {
-        if(err) throw err;
-        res.json({
-            status: 200,
-            results: results
-        })
-        console.log(err)
-    })
-
-});
-
-// get 1 product
-router.get('/products/:id', (req, res) => {
-     // mysql query
-     const strQry = `
-     SELECT * from products where Product_id = ?;
-     `;
-
-      // error controll
-    db.query(strQry, [req.params.id], (err, results) => {
-        if(err) throw err;
-        res.json({
-            status: 200,
-            results: (results.length <= 0) ? 'Sorry no product was found.' : results
-        })
-    });
-
-});
-
-// Delete product
-app.delete("/products/:id", (req, res) => {
-    // QUERY
-    const strQry = `
-    DELETE FROM products
-    WHERE Product_id = ?;
-    ALTER TABLE products AUTO_INCREMENT = 1;
-    `;
-    db.query(strQry, [req.params.id], (err, data) => {
-        if (err) throw err;
-        res.send(`${data.affectedRows} PRODUCT/S WAS DELETED`);
-    });
-});
-
-// Update product
-router.put("/products/:id", bodyParser.json(), async (req, res) => {
-    const { Prod_name, category, price, description, img1, img2, dateAdded } = req.body;
-    // mySQL query
-    let sql = `UPDATE products SET ? WHERE Product_id = ${req.params.id} `;
-
-    const product = {
-        Prod_name, category, price, description, img1, img2, dateAdded
-    };
-
-    db.query(sql, product, (err) => {
-      if (err) throw err;
-      res.json({
-        msg: "Updated Item Successfully",
-      });
     });
   });

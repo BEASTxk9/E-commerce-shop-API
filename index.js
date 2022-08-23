@@ -215,8 +215,11 @@ app.post('/register', bodyParser.json(), async(req, res) => {
                     ${err}
                     `)
                 } else{
-                    console.log(results);
-                    res.redirect('/logintest');
+                 
+                    res.send(`
+                    ${results}
+                    `)
+                    // res.redirect('/logintest');
                 }
             });
     } catch(e) {

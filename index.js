@@ -245,7 +245,7 @@ app.post('/login', bodyParser.json(),
             // key = localStorage.getItem('key');
             switch(true){
                 case (await compare(password,results[0].password)):
-                res.redirect('/products1')
+                res.send('logged in successfull')
                 break
                 default: 
                 console.log("Loggin Failed.");

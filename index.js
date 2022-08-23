@@ -213,11 +213,11 @@ app.post('/register', bodyParser.json(), async(req, res) => {
                     console.log(err);
                     res.send(`
                     <h1>${err}.</h1><br>
-                    <a href="/register">Go Back.</a>
+                    <a href="/registertest">Go Back.</a>
                     `)
                 } else{
                     console.log(results);
-                    res.redirect('/login');
+                    res.redirect('/logintest');
                 }
             });
     } catch(e) {
@@ -255,7 +255,7 @@ app.post('/login', bodyParser.json(), async(req, res) => {
                     // res.redirect('/login');
                     res.send(`
         <h1>Email or Password was Incorrect.<br>Please Insert the correct Email & Password.</h1><br>
-        <a href="/login">Go Back.</a>
+        <a href="/logintest">Go Back.</a>
         `);
             };
         } 

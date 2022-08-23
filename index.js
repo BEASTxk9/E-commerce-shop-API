@@ -223,35 +223,71 @@ app.post('/register', bodyParser.json(), async (req, res) => {
 });
 
 // login
-app.post('/login', bodyParser.json(), async (req, res) => {
-    try {
-        // get email and password
+// app.post('/login', bodyParser.json(), async (req, res) => {
+//     try {
+//         // get email and password
+//         const { email, password } = req.body;
+
+//         // mySQL query
+//         const strQry =
+//             `
+//         SELECT email, password FROM users WHERE email = '${email}';
+//         `;
+
+//         db.query(strQry, async (err, results) => {
+//             if (err) {
+//                 res.send(`${err}`)
+//             } else {
+
+//                 switch (true) {
+//                     case (await compare(password, results[0].password)):
+//                         res.send('Login was successfull.')
+//                         break
+//                     default:
+//                         res.redirect('/logintest');
+//                 };
+//             }
+//         })
+//     } catch (e) {
+//         res.send(`
+//         ${e.message}
+//         `)
+//     }
+// });
+// Login
+app.post('/login', bodyParser.json(),
+    (req, res)=> {
+    try{
+        // Get email and password
         const { email, password } = req.body;
-
-        // mySQL query
-        const strQry =
-            `
-        SELECT email, password FROM users WHERE email = '${email}';
+        const strQry = 
+        `
+        SELECT email, password
+        FROM users 
+        WHERE email = '${email}';
         `;
-
-        db.query(strQry, async (err, results) => {
-            if (err) {
-                res.send(`${err}`)
-            } else {
-
-                switch (true) {
-                    case (await compare(password, results[0].password)):
-                        res.send('Login was successfull.')
-                        break
-                    default:
-                        res.redirect('/logintest');
-                };
-            }
+        db.query(strQry, async (err, results)=> {
+            if(err) throw err;
+            // const key = jwt.sign(JSON.stringify(results[0]), process.env.secret);
+            // res.json({
+            //     status: 200,
+            //     results: key,
+            // });
+            // localStorage.setItem('key', JSON.stringify(key));
+            // key = localStorage.getItem('key');
+            switch(true){
+                case (await compare(password,results[0].password)):
+                res.redirect('/products1')
+                break
+                default: 
+                console.log("Bye");
+                res.send(`
+                EMAIL/PASSWORD IS INCORRECT.
+                `);
+            } 
         })
-    } catch (e) {
-        res.send(`
-        ${e.message}
-        `)
+    }catch(e) {
+        console.log(`From login: ${e.message}`);
     }
 });
 

@@ -222,38 +222,6 @@ app.post('/register', bodyParser.json(), async (req, res) => {
     }
 });
 
-// login
-// app.post('/login', bodyParser.json(), async (req, res) => {
-//     try {
-//         // get email and password
-//         const { email, password } = req.body;
-
-//         // mySQL query
-//         const strQry =
-//             `
-//         SELECT email, password FROM users WHERE email = '${email}';
-//         `;
-
-//         db.query(strQry, async (err, results) => {
-//             if (err) {
-//                 res.send(`${err}`)
-//             } else {
-
-//                 switch (true) {
-//                     case (await compare(password, results[0].password)):
-//                         res.send('Login was successfull.')
-//                         break
-//                     default:
-//                         res.redirect('/logintest');
-//                 };
-//             }
-//         })
-//     } catch (e) {
-//         res.send(`
-//         ${e.message}
-//         `)
-//     }
-// });
 // Login
 app.post('/login', bodyParser.json(),
     (req, res)=> {
@@ -281,9 +249,9 @@ app.post('/login', bodyParser.json(),
                 break
                 default: 
                 console.log("Loggin Failed.");
-                res.send(`
-                EMAIL/PASSWORD IS INCORRECT.
-                `);
+                // res.send(`
+                // EMAIL/PASSWORD IS INCORRECT.
+                // `);
             } 
         })
     }catch(e) {

@@ -289,7 +289,7 @@ router.get('/products', (req, res) => {
             results: results
         })
         console.log(err)
-    });
+    })
 
 });
 

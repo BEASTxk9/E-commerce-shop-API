@@ -215,7 +215,7 @@ app.post('/register', bodyParser.json(), async(req, res) => {
                     ${err}
                     `)
                 } else{
-                 
+                 console.log(results);
                     res.send(`
                     ${results}
                     `)

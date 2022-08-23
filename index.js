@@ -48,7 +48,7 @@ app.use(cors({
 // NAV ROUTER
 
 // home
-router.get('/hometest', (req, res) => {
+router.get('/', (req, res) => {
     res.status(200).sendFile('./views/index.html', {root:__dirname} );
 });
 

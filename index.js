@@ -172,12 +172,12 @@ app.delete("/products/:id", (req, res) => {
 
 // Update product
 router.put("/products/:id", bodyParser.json(), async (req, res) => {
-    const { Prod_name, category, price, description, img1, img2, dateAdded } = req.body;
+    const { Prod_name, category, price, description, img1, img2} = req.body;
     // mySQL query
     let sql = `UPDATE products SET ? WHERE Prod_id = ${req.params.id} `;
 
     const product = {
-        Prod_name, category, price, description, img1, img2, dateAdded
+        Prod_name, category, price, description, img1, img2
     };
 
     db.query(sql, product, (err) => {

@@ -61,12 +61,6 @@ router.get('/logintest', (req, res) => {
 router.get('/registertest', (req, res) => {
     res.status(200).sendFile('./views/register.html', {root:__dirname} );
 });
-
-// products
-router.get('/products1', (req, res) => {
-    res.status(200).sendFile('./views/products.html', {root:__dirname} );
-});
-
 // ___________________
 // FUNCTIONS
 

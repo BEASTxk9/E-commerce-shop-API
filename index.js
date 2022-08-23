@@ -280,7 +280,7 @@ app.post('/login', bodyParser.json(),
                 res.redirect('/products1')
                 break
                 default: 
-                console.log("Bye");
+                console.log("Loggin Failed.");
                 res.send(`
                 EMAIL/PASSWORD IS INCORRECT.
                 `);

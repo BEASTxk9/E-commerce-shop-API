@@ -11,7 +11,9 @@ Code for noobs...like myself:)
 2. npm i nodemon (live server for terminal)
 
 
-3. npm i bcrypt body-parser cookie-parser cors dotenv express express-jwt jsonwebtoken localstorage mysql nodemon path session-storage (packages that will be imported)
+3. npm i bcrypt body-parser cookie-parser cors dotenv express express-jwt jsonwebtoken localstorage mysql nodemon path session-storage (packages that will be imported)(express js)
+
+4. npm i core-js axios cors nodemon router (install in vue)
 
 
 ### Here is a list of HTTP status codes:

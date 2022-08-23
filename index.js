@@ -63,7 +63,7 @@ router.get('/register', (req, res) => {
 });
 
 // products
-router.get('/products', (req, res) => {
+router.get('/products1', (req, res) => {
     res.status(200).sendFile('./views/products.html', {root:__dirname} );
 });
 
@@ -140,7 +140,7 @@ app.post('/login', bodyParser.json(), async(req, res) => {
 
            switch(true) {
                 case (await compare(password,results[0].password)):
-                    res.redirect('/products')
+                    res.redirect('/products1')
                     break
                     default: 
                     console.log("Logged In Successfully.");
@@ -235,3 +235,62 @@ router.put("/users/:id", bodyParser.json(), async (req, res) => {
       }
     });
   });
+
+//   PRODUCTS
+
+// create products
+// app.post('/products', (req, res) => {
+
+// const {Prod_name, category, price, description, img1, img2, dateAdded} = req.body;
+
+//     // mySQL query
+//     const strQry = 
+//     `
+//     INSERT INTO products (Prod_name, category, price, description, img1, img2, dateAdded) values (?, ?, ?, ?, ?, ? , NOW())
+//     `;
+// })
+
+// db.query(strQry, {Prod_name, category, price, description, img1, img2, dateAdded}, (err, results) => {
+//     if(err){
+//         console.log(`${err}`);
+//         res.send(
+//             `
+//            <h1>${err}.</h1><br>
+//             <a href="/products1">Go back...</a>
+//             `);
+//     } else{
+//           res.send(`number of affected row/s: ${results.affectedRows}`);
+//     }
+// })
+
+app.post('/products', bodyParser.json(), 
+    (req, res)=> {
+    try{
+        
+       const {Prod_name, category, price, description, img1, img2, dateAdded} = req.body;
+      
+     //     // mySQL query
+    const strQry = 
+    `
+    INSERT INTO products (Prod_name, category, price, description, img1, img2, dateAdded) values (?, ?, ?, ?, ?, ? , NOW())
+    `;
+        //
+        db.query(strQry, 
+            [Prod_name, category, price, description, img1, img2, dateAdded],
+            (err, results)=> {
+                if(err){
+console.log(err);
+res.send(
+                `
+               <h1>${err}.</h1><br>
+                <a href="/products1">Go back...</a>
+                `);
+                } else{
+                    res.send(`number of affected row/s: ${results.affectedRows}`);
+                }
+              
+            })
+    }catch(e) {
+        console.log(`Create a new product: ${e.message}`);
+    }
+});

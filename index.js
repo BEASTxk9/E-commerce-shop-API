@@ -19,13 +19,13 @@ const app = express();
 const router = express.Router();
 
 // activate server
-app.listen(port, ()=> {
+app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
 
 // __________________
 // allow access to fetch data from the api externally by  Seting header
-app.use((req, res, next)=>{
+app.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Headers", "*");
     res.setHeader("Access-Control-Allow-Methods", "*");
@@ -34,42 +34,43 @@ app.use((req, res, next)=>{
 });
 
 // add cors to the app variable
-app.use(router, cors(), express.json(), 
+app.use(router, cors(), express.json(),
     express.urlencoded({
-    extended: true})
+        extended: true
+    })
 );
 
 app.use(cors({
     origin: ['http://127.0.0.1:8080', 'http://localhost:8080'],
     credentials: true
- }));
+}));
 
 // __________________
 // NAV ROUTER
 
 // home
 router.get('/', (req, res) => {
-    res.status(200).sendFile('./views/index.html', {root:__dirname} );
+    res.status(200).sendFile('./views/index.html', { root: __dirname });
 });
 
 // login
 router.get('/logintest', (req, res) => {
-    res.status(200).sendFile('./views/login.html', {root:__dirname} );
+    res.status(200).sendFile('./views/login.html', { root: __dirname });
 });
 
 // register
 router.get('/registertest', (req, res) => {
-    res.status(200).sendFile('./views/register.html', {root:__dirname} );
+    res.status(200).sendFile('./views/register.html', { root: __dirname });
 });
 // ___________________
 // FUNCTIONS
 
 // connect to database (TO MAKE SURE ITS CONNECTED).
-db.connect( (err) => {
-    if(err){
+db.connect((err) => {
+    if (err) {
         console.log(`mySQL is not connected...<br>
         ${err}`)
-    } else{
+    } else {
         console.log('mySQL connected...')
     }
 });
@@ -78,40 +79,40 @@ db.connect( (err) => {
 //   PRODUCTS
 
 // create products
-app.post('/products', bodyParser.json(), 
-    (req, res)=> {
-    try{
-        
-       const {Prod_name, category, price, description, img1, img2, dateAdded} = req.body;
-      
-     //     // mySQL query
-    const strQry = 
-    `
+app.post('/products', bodyParser.json(),
+    (req, res) => {
+        try {
+
+            const { Prod_name, category, price, description, img1, img2, dateAdded } = req.body;
+
+            //     // mySQL query
+            const strQry =
+                `
     INSERT INTO products (Prod_name, category, price, description, img1, img2, dateAdded) values (?, ?, ?, ?, ?, ? , NOW())
     `;
-        //
-        db.query(strQry, 
-            [Prod_name, category, price, description, img1, img2, dateAdded],
-            (err, results)=> {
-                if(err){
-console.log(err);
-res.send(
-                `
+            //
+            db.query(strQry,
+                [Prod_name, category, price, description, img1, img2, dateAdded],
+                (err, results) => {
+                    if (err) {
+                        console.log(err);
+                        res.send(
+                            `
                <h1>${err}.</h1><br>
                 <a href="/products1">Go back...</a>
                 `);
-                } else{
-                    res.send(`
+                    } else {
+                        res.send(`
                     number of affected row/s: ${results.affectedRows} <br>
                     <a href="/products">Go Back...</a>
                     `);
-                }
-              
-            })
-    }catch(e) {
-        console.log(`Create a new product: ${e.message}`);
-    }
-});
+                    }
+
+                })
+        } catch (e) {
+            console.log(`Create a new product: ${e.message}`);
+        }
+    });
 
 // get all products
 router.get('/products', (req, res) => {
@@ -122,7 +123,7 @@ router.get('/products', (req, res) => {
 
     // error controll
     db.query(strQry, (err, results) => {
-        if(err) throw err;
+        if (err) throw err;
         res.json({
             status: 200,
             results: results
@@ -134,14 +135,14 @@ router.get('/products', (req, res) => {
 
 // get 1 product
 router.get('/products/:id', (req, res) => {
-     // mysql query
-     const strQry = `
+    // mysql query
+    const strQry = `
      SELECT * from products where Prod_id = ?;
      `;
 
-      // error controll
+    // error controll
     db.query(strQry, [req.params.id], (err, results) => {
-        if(err) throw err;
+        if (err) throw err;
         res.json({
             status: 200,
             results: (results.length <= 0) ? 'Sorry no product was found.' : results
@@ -166,7 +167,7 @@ app.delete("/products/:id", (req, res) => {
 
 // Update product
 router.put("/products/:id", bodyParser.json(), async (req, res) => {
-    const { Prod_name, category, price, description, img1, img2} = req.body;
+    const { Prod_name, category, price, description, img1, img2 } = req.body;
     // mySQL query
     let sql = `UPDATE products SET ? WHERE Prod_id = ${req.params.id} `;
 
@@ -175,85 +176,79 @@ router.put("/products/:id", bodyParser.json(), async (req, res) => {
     };
 
     db.query(sql, product, (err) => {
-      if (err) throw err;
-      res.json({
-        msg: "Updated Item Successfully",
-      });
+        if (err) throw err;
+        res.json({
+            msg: "Updated Item Successfully",
+        });
     });
-  });
+});
 
 // REGISTER & LOGIN
 
 // register
-app.post('/register', bodyParser.json(), async(req, res) => {
-    try{
+app.post('/register', bodyParser.json(), async (req, res) => {
+    try {
         const bd = req.body;
 
-                // Encrypting a password
+        // Encrypting a password
         // Default value of salt is 10. 
         bd.password = await hash(bd.password, 16);
 
         // mySQL query
-        const strQry = 
-        `
+        const strQry =
+            `
         INSERT INTO users(fullName, email, gender, dateOfBirth, phoneNO, password, joinDate)
         VALUES(?, ?, ?, ?, ?, ?, NOW());
         `;
 
-        db.query(strQry, 
-            [bd.fullName, bd.email, bd.gender, bd.dateOfBirth ,bd.phoneNO, bd.password, bd.joinDate],
-            (err, results)=> {
-                if(err) {
+        db.query(strQry,
+            [bd.fullName, bd.email, bd.gender, bd.dateOfBirth, bd.phoneNO, bd.password, bd.joinDate],
+            (err, results) => {
+                if (err) {
                     console.log(err);
                     res.send(`
                     ${err}
                     `)
-                } else{
-                 console.log(results);
+                } else {
+                    console.log(results);
                     res.send(`
                     ${results}
                     `)
                     // res.redirect('/logintest');
                 }
             });
-    } catch(e) {
+    } catch (e) {
         console.log(`FROM REGISTER: ${e.message}`);
     }
 });
 
 // login
-app.post('/login', bodyParser.json(), async(req, res) => {
-    try{
+app.post('/login', bodyParser.json(), async (req, res) => {
+    try {
         // get email and password
-        const {email, password} = req.body;
+        const { email, password } = req.body;
 
         // mySQL query
-        const strQry = 
-        `
+        const strQry =
+            `
         SELECT email, password FROM users WHERE email = '${email}';
         `;
 
         db.query(strQry, async (err, results) => {
-            if(err){
-                console.log(err);
-                res.send(`
-                <h1>${err}.</h1><br>
-                <a href="/register">Go Back.</a>
-                `)
-            } else{
+            if (err) {
+                res.send(`${err}`)
+            } else {
 
-           switch(true) {
-                case (await compare(password,results[0].password)):
-                    res.send('Login was successfull.')
-                    break
-                    default: 
-                    // res.redirect('/login');
-                    res.send(`${err}`);
-            };
-        } 
+                switch (true) {
+                    case (await compare(password, results[0].password)):
+                        res.send('Login was successfull.')
+                        break
+                    default:
+                        res.redirect('/logintest');
+                };
+            }
         })
-    } catch(e){
-        console.log(`FROM LOGIN ${e.message}.`);
+    } catch (e) {
         res.send(`
         ${e.message}
         `)
@@ -266,12 +261,12 @@ router.get('/users', (req, res) => {
     const strQry = `SELECT * FROM users`;
 
     db.query(strQry, (err, results) => {
-        if(err) {
+        if (err) {
             console.log(err);
-                res.send(`
+            res.send(`
                 <h1>${err}.</h1><br>
                 <a href="/">Go Back.</a>
-                `) 
+                `)
         } else {
             res.json({
                 status: 200,
@@ -284,13 +279,13 @@ router.get('/users', (req, res) => {
 // get 1 user
 router.get('/users/:id', (req, res) => {
     // mySQL query
-    const strQry = 
-    `
+    const strQry =
+        `
 SELECT * FROM users WHERE id = ?;    
     `;
 
     db.query(strQry, [req.params.id], (err, results) => {
-        if(err) throw err;
+        if (err) throw err;
         res.json({
             status: 200,
             results: (results.length <= 0) ? 'Sorry no product was found.' : results
@@ -301,36 +296,36 @@ SELECT * FROM users WHERE id = ?;
 // delete user
 app.delete('/users/:id', (req, res) => {
     // mySQL query
-    const strQry = 
-    `
+    const strQry =
+        `
     DELETE FROM users WHERE id = ?;
     ALTER TABLE users AUTO_INCREMENT = 1;
     `;
 
     db.query(strQry, [req.params.id], (err, results) => {
-        if(err) throw err;
+        if (err) throw err;
         res.send(`USERS WAS DELETED`);
     });
 });
 
 // Update user
 router.put("/users/:id", bodyParser.json(), async (req, res) => {
-    const { fullName, email, gender, dateOfBirth, phoneNO, password} = req.body;
+    const { fullName, email, gender, dateOfBirth, phoneNO, password } = req.body;
     let sql = `UPDATE users SET ? WHERE id = ${req.params.id} `;
     const user = {
-        fullName, email, gender, dateOfBirth, phoneNO,password
+        fullName, email, gender, dateOfBirth, phoneNO, password
     };
     db.query(sql, user, (err) => {
-      if (err) {
-        console.log(err);
-        res.send(`
+        if (err) {
+            console.log(err);
+            res.send(`
         <h1>${err}.</h1><br>
         <a href="/register">Go Back.</a>
         `)
-      } else {
-        res.json({
-            msg: "Updated user Successfully",
-          });
-      }
+        } else {
+            res.json({
+                msg: "Updated user Successfully",
+            });
+        }
     });
-  });
+});

@@ -250,15 +250,11 @@ app.post('/login', bodyParser.json(), async(req, res) => {
 
            switch(true) {
                 case (await compare(password,results[0].password)):
-                    res.redirect('/products1')
+                    res.send('Login was successfull.')
                     break
                     default: 
-                    console.log("Logged In Successfully.");
                     // res.redirect('/login');
-                    res.send(`
-        <h1>Email or Password was Incorrect.<br>Please Insert the correct Email & Password.</h1><br>
-        <a href="/logintest">Go Back.</a>
-        `);
+                    res.send(`${err}`);
             };
         } 
         })

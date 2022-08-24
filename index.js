@@ -342,7 +342,7 @@ router.put("/products/:id", bodyParser.json(), async (req, res) => {
 //     // fetch from body
 // const { cart } = req.body;
 // // mySQL query
-// const strQry = `INSERT INTO users(cart) FROM products WHERE Prod_id = ?`;
+// const strQry = `INSERT INTO users(cart) FROM products SELECT * WHERE Prod_id = ?`;
 
 // db.query(strQry, { cart }, (req, res) =>{
 // if(err){

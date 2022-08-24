@@ -226,6 +226,7 @@ router.put("/users/:id", bodyParser.json(), async (req, res) => {
     });
 });
 
+// ___________________________
 //   PRODUCTS
 
 // create product

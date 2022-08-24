@@ -337,21 +337,38 @@ router.put("/products/:id", bodyParser.json(), async (req, res) => {
 
 
 // CART
-// app.post('/cart', (req, res) => {
-// try{
-//     // fetch from body
-// const { cart } = req.body;
-// // mySQL query
-// const strQry = `INSERT INTO users(cart) FROM products SELECT * WHERE Prod_id = ?`;
+//*GET CART ITEMS FROM SPECIFIC USER*//
 
-// db.query(strQry, { cart }, (req, res) =>{
-// if(err){
-//     res.send(`${err}`);
-// } else {
-//     res.send(`DATA WAS ADDED`);
-// }
-// })
-// } catch(e){
-//     console.log(`${err}`);
-// }
-// });
+router.get("/users/:id/cart", (req, res) => {
+    // Query
+    const strQry = `
+    SELECT *
+    FROM users
+    WHERE id = ?;
+    `;
+    db.query(strQry, [req.params.id], (err, results) => {
+        if (err) throw err;
+        res.json({
+            status: 200,
+            results: results[0].cart,
+        });
+    });
+});
+
+//*DELETE CART ITEMS FROM SPECIFIC USER*//
+
+router.delete("/users/:id/cart", (req, res) => {
+    // Query
+    const strQry = `
+    UPDATE users
+    SET cart=null
+    WHERE id=?
+    `;
+    db.query(strQry, [req.params.id], (err, results) => {
+        if (err) throw err;
+        res.json({
+            status: 200,
+            results: results,
+        });
+    });
+});

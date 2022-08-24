@@ -116,40 +116,40 @@ app.post('/register', bodyParser.json(), async (req, res) => {
 
 // Login
 app.post('/login', bodyParser.json(),
-    (req, res)=> {
-    try{
-        // Get email and password
-        const { email, password } = req.body;
-        const strQry = 
-        `
+    (req, res) => {
+        try {
+            // Get email and password
+            const { email, password } = req.body;
+            const strQry =
+                `
         SELECT email, password
         FROM users 
         WHERE email = '${email}';
         `;
-        db.query(strQry, async (err, results)=> {
-            if(err) throw err;
-            // const key = jwt.sign(JSON.stringify(results[0]), process.env.secret);
-            // res.json({
-            //     status: 200,
-            //     results: key,
-            // });
-            // localStorage.setItem('key', JSON.stringify(key));
-            // key = localStorage.getItem('key');
-            switch(true){
-                case (await compare(password,results[0].password)):
-                res.send('logged in successfull')
-                break
-                default: 
-                console.log("Loggin Failed.");
-                // res.send(`
-                // EMAIL/PASSWORD IS INCORRECT.
-                // `);
-            } 
-        })
-    }catch(e) {
-        console.log(`From login: ${e.message}`);
-    }
-});
+            db.query(strQry, async (err, results) => {
+                if (err) throw err;
+                // const key = jwt.sign(JSON.stringify(results[0]), process.env.secret);
+                // res.json({
+                //     status: 200,
+                //     results: key,
+                // });
+                // localStorage.setItem('key', JSON.stringify(key));
+                // key = localStorage.getItem('key');
+                switch (true) {
+                    case (await compare(password, results[0].password)):
+                        res.send('logged in successfull')
+                        break
+                    default:
+                        console.log("Loggin Failed.");
+                    // res.send(`
+                    // EMAIL/PASSWORD IS INCORRECT.
+                    // `);
+                }
+            })
+        } catch (e) {
+            console.log(`From login: ${e.message}`);
+        }
+    });
 
 // get all users
 router.get('/users', (req, res) => {
@@ -337,8 +337,40 @@ router.put("/products/:id", bodyParser.json(), async (req, res) => {
 
 
 // CART
-//*GET CART ITEMS FROM SPECIFIC USER*//
+//*ADD CART ITEMS FROM SPECIFIC USER*//
+// app.post('/users/:id/cart', bodyParser.json(), (req, res) => {
+//     db.getConnection((err, connected) => {
+//         if (err) throw err; const check = `SELECT cart FROM users WHERE id = ?`;
+//         connected.query(check, req.params.id, (err, results) => {
+//             if (err) throw err;
+//             if (results.length > 0) {
+//                 let newCart;
+//                 if (results[0].cart == null) { newCart = [] }
+//                 else { newCart = JSON.parse(results[0].cart); }
+//                 let product =
+//                 {
+//                     "Prod_id": newCart.length + 1,
+//                     "Prod_name": req.body.Prod_name,
+//                     "category": req.body.category,
+//                     "price": req.body.price,
+//                     "description": req.body.description,
+//                     "img1": req.body.img1,
+//                     "img2": req.body.img2,
+//                     "dateAdded": req.body.dateAdded
 
+//                 }
+//                 newCart.push(product); const query = `UPDATE users SET cart = ? WHERE id=?`;
+//                 connected.query(query, [JSON.stringify(newCart), req.params.id], (err, results) => {
+//                     if (err) throw err;
+//                     res.json({ status: 200, results: "Successfully added item to cart" })
+//                 })
+//             } else { res.json({ status: 400, result: `There is no user with that id` }) }
+//         })
+//         connected.release();
+//     })
+// })
+
+//*GET CART ITEMS FROM SPECIFIC USER*
 router.get("/users/:id/cart", (req, res) => {
     // Query
     const strQry = `
@@ -355,8 +387,7 @@ router.get("/users/:id/cart", (req, res) => {
     });
 });
 
-//*DELETE CART ITEMS FROM SPECIFIC USER*//
-
+//*DELETE CART ITEMS FROM SPECIFIC USER*
 router.delete("/users/:id/cart", (req, res) => {
     // Query
     const strQry = `

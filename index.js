@@ -393,18 +393,21 @@ router.get("/users/:id/cart", (req, res) => {
 });
 
 // get single cart data
-router.get("/users/:id/cart/:id", (req, res) => {
+router.get("/users/:id/cart/:cartId", (req, res) => {
     // Query
-    const strQry = `
-    SELECT *
-    FROM users
-    WHERE id = ?;
-    `;
+            const strQry = `
+        SELECT *
+        FROM users
+        WHERE id = ?;
+        `;
     db.query(strQry, [req.params.id], (err, results) => {
         if (err) throw err;
+        let cartResults = JSON.parse(results[0].cart);
         res.json({
             status: 200,
-            results: JSON.parse(results[0].cart),
+            results: cartResults.filter((item)=>{
+                return item.cart_id == req.params.cartId
+            }),
         });
     });
 });

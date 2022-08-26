@@ -1,11 +1,11 @@
 require('dotenv').config();
-const { createPool } = require('mysql');
+const { createConnection } = require('mysql');
 
 // create connection variable
 let connection;
 // create function to allow connection
 (function handleConnection() {
-    connection = createPool({
+    connection = createConnection({
         host: process.env.host,
         database: process.env.database,
         user: process.env.dbUser,

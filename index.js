@@ -32,18 +32,18 @@ app.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-*", "*");
     next();
 });
+app.use(cors({
+    origin: ['http://127.0.0.1:8080', 'http://localhost:8080'],
+    credentials: true
+}));
 
 // add cors to the app variable
-app.use(router, cors(), express.json(),
+app.use(router, express.json(),
     express.urlencoded({
         extended: true
     })
 );
 
-app.use(cors({
-    origin: ['http://127.0.0.1:8080', 'http://localhost:8080'],
-    credentials: true
-}));
 
 // __________________
 // NAV ROUTER

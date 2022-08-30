@@ -320,13 +320,13 @@ app.delete("/products/:id", (req, res) => {
 router.put("/products/:id", bodyParser.json(), async (req, res) => {
     const { Prod_name, category, price, description, img1, img2 } = req.body;
     // mySQL query
-    let sql = `UPDATE products SET ? WHERE Prod_id = ${req.params.id} `;
+    let sql = "UPDATE products SET ? WHERE Prod_id = ? ";
 
     const product = {
         Prod_name, category, price, description, img1, img2
     };
 
-    db.query(sql, product, (err) => {
+    db.query(sql, [product, req.params.id], (err) => {
         if (err) throw err;
         res.json({
             msg: "Updated Item Successfully",

@@ -129,11 +129,16 @@ app.post('/login', bodyParser.json(),
             db.query(strQry, async (err, results) => {
                 if (err) throw err;
                 const key = jwt.sign(JSON.stringify(results[0]), process.env.secret);
-                localStorage.setItem('key', JSON.stringify(key));
-                key = localStorage.getItem('key');
+          
                 switch (true) {
                     case (await compare(password, results[0].password)):
                         res.send('logged in successfull')
+                        res.json({
+                            status: 200,
+                            results: key,
+                        });
+                        localStorage.setItem('key', JSON.stringify(key));
+                        key = localStorage.getItem('key');
                         break
                     default:
                         console.log("Loggin Failed.");

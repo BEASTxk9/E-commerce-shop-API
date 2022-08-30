@@ -327,10 +327,14 @@ router.put("/products/:id", bodyParser.json(), async (req, res) => {
     };
 
     db.query(sql, [product, req.params.id], (err) => {
-        if (err) throw err;
-        res.json({
-            msg: "Updated Item Successfully",
-        });
+        if (err) {
+            res.status(404).send(err)
+        } else {
+            res.status(200).json({
+                msg: "Updated Item Successfully",
+            });
+        }
+     
     });
 });
 

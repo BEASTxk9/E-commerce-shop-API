@@ -129,10 +129,6 @@ app.post('/login', bodyParser.json(),
             db.query(strQry, async (err, results) => {
                 if (err) throw err;
                 const key = jwt.sign(JSON.stringify(results[0]), process.env.secret);
-                res.json({
-                    status: 200,
-                    results: key,
-                });
                 localStorage.setItem('key', JSON.stringify(key));
                 key = localStorage.getItem('key');
                 switch (true) {

@@ -127,23 +127,22 @@ app.post('/login', bodyParser.json(),
         WHERE email = '${email}';
         `;
             db.query(strQry, async (err, results) => {
+
                 if (err) throw err;
-                const key = jwt.sign(JSON.stringify(results[0]), process.env.secret);
-                res.send(`logged in successfull`).json({
-                    status: 200,
-                    results: key,
-                });
-                localStorage.setItem('key', JSON.stringify(key));
-                key = localStorage.getItem('key');
+            
                 switch (true) {
                     case (await compare(password, results[0].password)):
-                        res.send('logged in successfull');
+                        jwt.sign(JSON.stringify(results[0]), process.env.secret, (err, token) => {
+                            if(err) throw err;
+                            res.json({
+                                status: 200,
+                                user: results,
+                                token: token
+                            })
+                        });
                         break
                     default:
                         console.log("Loggin Failed.");
-                    // res.send(`
-                    // EMAIL/PASSWORD IS INCORRECT.
-                    // `);
                 }
             })
         } catch (e) {

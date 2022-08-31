@@ -65,16 +65,6 @@ router.get('/registertest', (req, res) => {
 // ___________________
 // FUNCTIONS
 
-// connect to database (TO MAKE SURE ITS CONNECTED).
-db.connect((err) => {
-    if (err) {
-        console.log(`mySQL is not connected...<br>
-        ${err}`)
-    } else {
-        console.log('mySQL connected...')
-    }
-});
-
 // REGISTER & LOGIN
 
 // register

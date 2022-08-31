@@ -132,7 +132,7 @@ app.post('/login', bodyParser.json(),
             
                 switch (true) {
                     case (await compare(password, results[0].password)):
-                        jwt.sign(JSON.stringify(results[0]), process.env.secret, {expiresIn: "7d"}, (err, token) => {
+                        jwt.sign(JSON.stringify(results[0]), process.env.secret, (err, token) => {
                             if(err) throw err;
                             res.json({
                                 status: 200,

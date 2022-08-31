@@ -136,7 +136,7 @@ app.post('/login', bodyParser.json(),
                     default:
                       res.json({
                         status: 400, 
-                        msg: "Login Failed."
+                        msg: "Email/Password is incorrect. Please try again."
                     })
                 }
             })

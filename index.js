@@ -132,7 +132,10 @@ app.post('/login', bodyParser.json(),
                         });
                         break
                     default:
-                        console.log("Loggin Failed.");
+                      res.json({
+                        status: 400, 
+                        msg: "Login Failed."
+                    })
                 }
             })
         } catch (e) {

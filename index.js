@@ -96,7 +96,7 @@ app.post('/register', bodyParser.json(), async (req, res) => {
                     console.log(results);
                     res.json({
                         status: 200, 
-                        msg: "Register Successfull."
+                        msg: "Register Successfull "
                     })
                     // res.redirect('/logintest');
                 }
@@ -114,7 +114,7 @@ app.post('/login', bodyParser.json(),
             const { email, password } = req.body;
             const strQry =
                 `
-        SELECT email, password
+        SELECT *
         FROM users 
         WHERE email = '${email}';
         `;

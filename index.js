@@ -88,14 +88,16 @@ app.post('/register', bodyParser.json(), async (req, res) => {
             (err, results) => {
                 if (err) {
                     console.log(err);
-                    res.send(`
-                    ${err}
-                    `)
+                    res.json({
+                        status: 400, 
+                        msg: "Register Failed."
+                    })
                 } else {
                     console.log(results);
-                    res.send(`
-                    ${results}
-                    `)
+                    res.json({
+                        status: 200, 
+                        msg: "Register Successfull."
+                    })
                     // res.redirect('/logintest');
                 }
             });

@@ -200,10 +200,10 @@ app.delete('/users/:id', (req, res) => {
 
 // Update user
 router.put("/users/:id", bodyParser.json(), async (req, res) => {
-    const { fullName, email, gender, dateOfBirth, phoneNO, password } = req.body;
+    const { fullName, email, gender, dateOfBirth, phoneNO, userRole, password } = req.body;
     let sql = `UPDATE users SET ? WHERE id = ${req.params.id} `;
     const user = {
-        fullName, email, gender, dateOfBirth, phoneNO, password
+        fullName, email, gender, dateOfBirth, phoneNO, userRole, password
     };
     db.query(sql, user, (err) => {
         if (err) {

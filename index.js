@@ -194,7 +194,9 @@ app.delete('/users/:id', (req, res) => {
 
     db.query(strQry, [req.params.id], (err, results) => {
         if (err) throw err;
-        res.send(`USERS WAS DELETED`);
+        res.json({
+            msg : `USERS WAS DELETED`
+        });
     });
 });
 
@@ -306,7 +308,9 @@ app.delete("/products/:id", (req, res) => {
     `;
     db.query(strQry, [req.params.id], (err, data) => {
         if (err) throw err;
-        res.send(`${data.affectedRows} PRODUCT/S WAS DELETED`);
+        res.json({
+            msg: `${data.affectedRows} PRODUCT/S WAS DELETED`
+    });
     });
 });
 

@@ -78,8 +78,7 @@ app.post('/register', bodyParser.json(), async (req, res) => {
         bd.password = await hash(bd.password, 16);
 
         // mySQL query
-        const strQry =
-            `
+        const strQry = `
         INSERT INTO users(fullName, email, gender, dateOfBirth, phoneNO, password, joinDate)
         VALUES(?, ?, ?, ?, ?, ?, NOW());
         `;
@@ -90,18 +89,18 @@ app.post('/register', bodyParser.json(), async (req, res) => {
                 if (err) {
                     console.log(err);
                     res.json({
-                        status: 400, 
+                        status: 400,
                         msg: "Register Failed."
                     })
                 } else {
                     console.log(results);
                     res.json({
-                        status: 200, 
+                        status: 200,
                         msg: "Register Successfull "
                     })
-                    // res.redirect('/logintest');
-                }
+                };
             });
+
     } catch (e) {
         console.log(`FROM REGISTER: ${e.message}`);
     }
@@ -113,8 +112,7 @@ app.post('/login', bodyParser.json(),
         try {
             // Get email and password
             const { email, password } = req.body;
-            const strQry =
-                `
+            const strQry = `
         SELECT *
         FROM users 
         WHERE email = '${email}';
@@ -122,11 +120,11 @@ app.post('/login', bodyParser.json(),
             db.query(strQry, async (err, results) => {
 
                 if (err) throw err;
-            
+
                 switch (true) {
                     case (await compare(password, results[0].password)):
                         jwt.sign(JSON.stringify(results[0]), process.env.secret, (err, token) => {
-                            if(err) throw err;
+                            if (err) throw err;
                             res.json({
                                 status: 200,
                                 user: results,
@@ -135,10 +133,10 @@ app.post('/login', bodyParser.json(),
                         });
                         break
                     default:
-                      res.json({
-                        status: 400, 
-                        msg: "Email/Password is incorrect. Please try again."
-                    })
+                        res.json({
+                            status: 400,
+                            msg: "Email/Password is incorrect. Please try again."
+                        })
                 }
             })
         } catch (e) {
@@ -153,15 +151,16 @@ router.get('/users', (req, res) => {
 
     db.query(strQry, (err, results) => {
         if (err) {
-            console.log(err);
-            res.send(`
-                <h1>${err}.</h1><br>
-                <a href="/">Go Back.</a>
-                `)
+            res.json({
+                status: 400,
+                results: err,
+                msg: "Getting users failed"
+            })
         } else {
             res.json({
                 status: 200,
                 results: results,
+                msg: "Getting users successfull"
             })
         }
     })
@@ -176,7 +175,11 @@ SELECT * FROM users WHERE id = ?;
     `;
 
     db.query(strQry, [req.params.id], (err, results) => {
-        if (err) throw err;
+        if (err) 
+        res.json({
+            status: 400,
+            results: `${err}`
+        });
         res.json({
             status: 200,
             results: (results.length <= 0) ? 'Sorry no product was found.' : results
@@ -194,15 +197,16 @@ app.delete('/users/:id', (req, res) => {
     `;
 
     db.query(strQry, [req.params.id], (err, results) => {
-        if (err) 
-        res.json({
-            status: 400,
-            msg: `${err}`})
-            ;
-            // else
+        if (err)
+            res.json({
+                status: 400,
+                msg: `${err}`
+            })
+                ;
+        // else
         res.json({
             status: 200,
-            msg : `Deleted Successfully`
+            msg: `Deleted Successfully`
         });
     });
 });
@@ -216,14 +220,14 @@ router.put("/users/:id", bodyParser.json(), async (req, res) => {
     };
     db.query(sql, user, (err) => {
         if (err) {
-            console.log(err);
-            res.send(`
-        <h1>${err}.</h1><br>
-        <a href="/register">Go Back.</a>
-        `)
+            res.json({
+                status: 400,
+                msg: `Updated failed ${err}`,
+            });
         } else {
             res.json({
-                msg: "Updated user Successfully",
+                status: 200,
+                msg: "Updated Successfull",
             });
         }
     });
@@ -249,22 +253,23 @@ app.post('/products', bodyParser.json(),
                 [Prod_name, category, price, description, img1, img2, dateAdded],
                 (err, results) => {
                     if (err) {
-                        console.log(err);
-                        res.send(
-                            `
-               <h1>${err}.</h1><br>
-                <a href="/products1">Go back...</a>
-                `);
+                        res.json({
+                            status: 400,
+                            msg: `Product create failed ${err}`,
+                        });
                     } else {
-                        res.send(`
-                    number of affected row/s: ${results.affectedRows} <br>
-                    <a href="/products">Go Back...</a>
-                    `);
+                        res.json({
+                            status: 200,
+                            msg: "Product create Successfull",
+                        });
                     }
 
                 })
         } catch (e) {
-            console.log(`Create a new product: ${e.message}`);
+            res.json({
+                status: 400,
+                msg: "Product create failed",
+            });
         }
     });
 
@@ -296,7 +301,10 @@ router.get('/products/:id', (req, res) => {
 
     // error controll
     db.query(strQry, [req.params.id], (err, results) => {
-        if (err) throw err;
+        if (err)   res.json({
+            status: 400,
+            results: `${err}`
+        });
         res.json({
             status: 200,
             results: (results.length <= 0) ? 'Sorry no product was found.' : results
@@ -314,16 +322,17 @@ app.delete("/products/:id", (req, res) => {
     ALTER TABLE products AUTO_INCREMENT = 1;
     `;
     db.query(strQry, [req.params.id], (err, data) => {
-        if (err) 
-        res.json({
-            status: 400,
-            msg: `${err}`})
-    ;
-    // else
+        if (err)
+            res.json({
+                status: 400,
+                msg: `${err}`
+            })
+                ;
+        // else
         res.json({
             status: 200,
             msg: `${data.affectedRows} PRODUCT/S WAS DELETED`
-    });
+        });
     });
 });
 
@@ -339,55 +348,61 @@ router.put("/products/:id", bodyParser.json(), async (req, res) => {
 
     db.query(sql, [product, req.params.id], (err) => {
         if (err) {
-            res.status(404).send(err)
+            res.status(400).json({
+                msg: "Updated product failed",
+            });
         } else {
             res.status(200).json({
-                msg: "Updated Item Successfully",
+                msg: "Updated product successfull",
             });
         }
-     
+
     });
 });
 
 // CART
 
 // add to cart
-    router.post('/users/:id/cart', bodyParser.json(), (req, res) => {
+router.post('/users/:id/cart', bodyParser.json(), (req, res) => {
 
-        // mySQL query
-        let cart = `SELECT cart FROM users WHERE id = ${req.params.id};`;
-        // function
-        db.query(cart, (err, results) => {
-            if (err) throw err
-            if (results.length > 0) {
-                let cart;
-                if (results[0].cart == null) {
-                    cart = []
-                } else {
-                    cart = JSON.parse(results[0].cart)
-                }
-
-        let { Prod_id } = req.body;
-        // mySQL query
-        let product = `Select * FROM products WHERE Prod_id = ?`;
-        // function
-        db.query(product, Prod_id, (err, productData) => {
-            if (err) res.send(`${err}`)
-            let data = {
-                cart_id : cart.length + 1,
-                productData
+    // mySQL query
+    let cart = `SELECT cart FROM users WHERE id = ${req.params.id};`;
+    // function
+    db.query(cart, (err, results) => {
+        if (err) throw err
+        if (results.length > 0) {
+            let cart;
+            if (results[0].cart == null) {
+                cart = []
+            } else {
+                cart = JSON.parse(results[0].cart)
             }
-            cart.push(data)
-            console.log(cart);
-            let updateCart = `UPDATE users SET cart = ? WHERE id = ${req.params.id}`
-            db.query(updateCart, JSON.stringify(cart), (err, results) => {
+
+            let { Prod_id } = req.body;
+            // mySQL query
+            let product = `Select * FROM products WHERE Prod_id = ?`;
+            // function
+            db.query(product, Prod_id, (err, productData) => {
                 if (err) res.send(`${err}`)
-                res.json({
-                    cart: results
+                let data = {
+                    cart_id: cart.length + 1,
+                    productData
+                }
+                cart.push(data)
+                console.log(cart);
+                let updateCart = `UPDATE users SET cart = ? WHERE id = ${req.params.id}`
+                db.query(updateCart, JSON.stringify(cart), (err, results) => {
+                    if (err) res.json({
+                        status: 400,
+                        msg:`${err}`})
+                    res.json({
+                        status: 200,
+                        cart: results
+                    })
                 })
             })
-        })
-}})
+        }
+    })
 });
 
 // get all cart data
@@ -399,7 +414,11 @@ router.get("/users/:id/cart", (req, res) => {
     WHERE id = ?;
     `;
     db.query(strQry, [req.params.id], (err, results) => {
-        if (err) throw err;
+        if (err) 
+        res.json({
+            status: 400,
+            results: `${err}`,
+        });;
         res.json({
             status: 200,
             results: JSON.parse(results[0].cart),
@@ -410,7 +429,7 @@ router.get("/users/:id/cart", (req, res) => {
 // get single cart data
 router.get("/users/:id/cart/:cartId", (req, res) => {
     // Query
-            const strQry = `
+    const strQry = `
         SELECT *
         FROM users
         WHERE id = ?;
@@ -420,7 +439,7 @@ router.get("/users/:id/cart/:cartId", (req, res) => {
         let cartResults = JSON.parse(results[0].cart);
         res.json({
             status: 200,
-            results: cartResults.filter((item)=>{
+            results: cartResults.filter((item) => {
                 return item.cart_id == req.params.cartId
             }),
         });
@@ -436,11 +455,12 @@ router.delete("/users/:id/cart", (req, res) => {
     WHERE id=?
     `;
     db.query(strQry, [req.params.id], (err, results) => {
-        if (err) 
-        res.json({
-            status: 400,
-            msg: `${err}`});
-            // else
+        if (err)
+            res.json({
+                status: 400,
+                msg: `${err}`
+            });
+        // else
         res.json({
             status: 200,
             results: results,
@@ -449,19 +469,19 @@ router.delete("/users/:id/cart", (req, res) => {
 });
 
 // delete single cart data
-router.delete('/users/:id/cart/:cartId', (req,res)=>{
+router.delete('/users/:id/cart/:cartId', (req, res) => {
     const delSingleCartId = `
         SELECT cart FROM users
         WHERE id = ${req.params.id}
     `
-    db.query(delSingleCartId, (err,results)=>{
-        if(err) throw err;
-        if(results.length > 0){
-            if(results[0].cart != null){
-                const result = JSON.parse(results[0].cart).filter((cart)=>{
+    db.query(delSingleCartId, (err, results) => {
+        if (err) throw err;
+        if (results.length > 0) {
+            if (results[0].cart != null) {
+                const result = JSON.parse(results[0].cart).filter((cart) => {
                     return cart.cart_id != req.params.cartId;
                 })
-                result.forEach((cart,i) => {
+                result.forEach((cart, i) => {
                     cart.cart_id = i + 1
                 });
                 const query = `
@@ -469,26 +489,27 @@ router.delete('/users/:id/cart/:cartId', (req,res)=>{
                     SET cart = ?
                     WHERE id = ${req.params.id}
                 `
-                db.query(query, [JSON.stringify(result)], (err,results)=>{
-                    if(err) 
+                db.query(query, [JSON.stringify(result)], (err, results) => {
+                    if (err)
+                        res.json({
+                            status: 400,
+                            msg: `${err}`
+                        });
+                    // else
                     res.json({
-                        status: 400,
-                        msg: `${err}`});
-                        // else
-                    res.json({
-                        status:200,
+                        status: 200,
                         result: "Successfully deleted item from cart"
                     });
                 })
-            }else{
+            } else {
                 res.json({
-                    status:400,
+                    status: 400,
                     result: "This user has an empty cart"
                 })
             }
-        }else{
+        } else {
             res.json({
-                status:400,
+                status: 400,
                 result: "There is no user with that id"
             });
         }

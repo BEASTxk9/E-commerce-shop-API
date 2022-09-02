@@ -32,6 +32,7 @@ app.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-*", "*");
     next();
 });
+
 app.use(cors({
     origin: ['http://127.0.0.1:8080', 'http://localhost:8080'],
     credentials: true
@@ -43,7 +44,6 @@ app.use(router, express.json(),
         extended: true
     })
 );
-
 
 // __________________
 // NAV ROUTER
@@ -62,6 +62,7 @@ router.get('/logintest', (req, res) => {
 router.get('/registertest', (req, res) => {
     res.status(200).sendFile('./views/register.html', { root: __dirname });
 });
+
 // ___________________
 // FUNCTIONS
 
@@ -193,9 +194,15 @@ app.delete('/users/:id', (req, res) => {
     `;
 
     db.query(strQry, [req.params.id], (err, results) => {
-        if (err) throw err;
+        if (err) 
         res.json({
-            msg : `USERS WAS DELETED`
+            status: 400,
+            msg: `${err}`})
+            ;
+            // else
+        res.json({
+            status: 200,
+            msg : `Deleted Successfully`
         });
     });
 });
@@ -307,8 +314,14 @@ app.delete("/products/:id", (req, res) => {
     ALTER TABLE products AUTO_INCREMENT = 1;
     `;
     db.query(strQry, [req.params.id], (err, data) => {
-        if (err) throw err;
+        if (err) 
         res.json({
+            status: 400,
+            msg: `${err}`})
+    ;
+    // else
+        res.json({
+            status: 200,
             msg: `${data.affectedRows} PRODUCT/S WAS DELETED`
     });
     });
@@ -423,7 +436,11 @@ router.delete("/users/:id/cart", (req, res) => {
     WHERE id=?
     `;
     db.query(strQry, [req.params.id], (err, results) => {
-        if (err) throw err;
+        if (err) 
+        res.json({
+            status: 400,
+            msg: `${err}`});
+            // else
         res.json({
             status: 200,
             results: results,
@@ -453,7 +470,11 @@ router.delete('/users/:id/cart/:cartId', (req,res)=>{
                     WHERE id = ${req.params.id}
                 `
                 db.query(query, [JSON.stringify(result)], (err,results)=>{
-                    if(err) throw err;
+                    if(err) 
+                    res.json({
+                        status: 400,
+                        msg: `${err}`});
+                        // else
                     res.json({
                         status:200,
                         result: "Successfully deleted item from cart"

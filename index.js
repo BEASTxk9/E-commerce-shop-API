@@ -87,13 +87,11 @@ app.post('/register', bodyParser.json(), async (req, res) => {
             [bd.fullName, bd.email, bd.gender, bd.dateOfBirth, bd.phoneNO, bd.password, bd.joinDate],
             (err, results) => {
                 if (err) {
-                    console.log(err);
                     res.json({
                         status: 400,
                         msg: "Register Failed."
                     })
                 } else {
-                    console.log(results);
                     res.json({
                         status: 200,
                         msg: "Register Successfull "
@@ -102,7 +100,10 @@ app.post('/register', bodyParser.json(), async (req, res) => {
             });
 
     } catch (e) {
-        console.log(`FROM REGISTER: ${e.message}`);
+        res.json({
+            status: 400,
+            msg: "Please register, or try again"
+        })
     }
 });
 

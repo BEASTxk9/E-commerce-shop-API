@@ -15,7 +15,7 @@
 <header class="mb-3">
 
     <div class="container">
-        <div class="row justify-content-center text-center">
+        <div class="row justify-content-center text-center text-dark">
             <div class="col-sm-10 text-black text-decoration-none fw-bold fs-4">
                 <nav>
                     <a href="/">Home</a> |
@@ -58,6 +58,19 @@
                 <li><span class="fw-bold">(PUT)/users/:id :</span> Update single user.</li>
 
                 <li><span class="fw-bold">(DELETE)/users/:id :</span> DELETE single user.</li>
+                <hr>
+
+                <h2 class="text-center fw-bold">CART ENDPOINTS</h2><br>
+               
+                <li><span class="fw-bold">(GET)/users/:id/cart :</span>Get all user cart items.</li>
+                
+                <li><span class="fw-bold">(GET)/users/:id/cart/:cart_id :</span> Get single user cart item.</li>
+
+                <li><span class="fw-bold">(POST)/users/:id/cart :</span> Add single item to cart.</li>
+
+                <li><span class="fw-bold">(DELETE)/users/:id/cart :</span> DELETE all items from user cart.</li>
+
+                <li><span class="fw-bold">(DELETE)/users/:id/cart/:cart_id :</span> DELETE single item from user cart.</li>
                 <hr>
             </div>
         </div>

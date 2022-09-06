@@ -63,7 +63,7 @@ router.get('/registertest', (req, res) => {
     res.status(200).sendFile('./views/register.html', { root: __dirname });
 });
 
-// ___________________
+// __________________
 // FUNCTIONS
 
 // REGISTER & LOGIN

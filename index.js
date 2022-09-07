@@ -314,7 +314,7 @@ router.get('/products/:id', (req, res) => {
 
 });
 
-// Delete product
+// Delete single product
 app.delete("/products/:id", (req, res) => {
     // QUERY
     const strQry = `
@@ -326,7 +326,7 @@ app.delete("/products/:id", (req, res) => {
         if (err)
             res.json({
                 status: 400,
-                msg: `${err}`
+                msg: `DELETE FAILED`
             })
                 ;
         // else
@@ -459,7 +459,7 @@ router.delete("/users/:id/cart", (req, res) => {
         if (err)
             res.json({
                 status: 400,
-                msg: `${err}`
+                msg: `DELETE FAILED`
             });
         // else
         res.json({

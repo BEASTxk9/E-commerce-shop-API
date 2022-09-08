@@ -223,12 +223,12 @@ router.put("/users/:id", bodyParser.json(), async (req, res) => {
         if (err) {
             res.json({
                 status: 400,
-                msg: `Updated failed ${err}`,
+                msg: "Edit Failed.",
             });
         } else {
             res.json({
                 status: 200,
-                msg: "Updated Successfull",
+                msg: "Edit Successfull.",
             });
         }
     });

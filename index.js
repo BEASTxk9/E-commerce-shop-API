@@ -464,7 +464,7 @@ router.delete("/users/:id/cart", (req, res) => {
         // else
         res.json({
             status: 200,
-            results: results,
+            msg: "Cart cleared."
         });
     });
 });

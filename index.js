@@ -110,7 +110,6 @@ app.post('/register', bodyParser.json(), async (req, res) => {
 // Login
 app.post('/login', bodyParser.json(),
     (req, res) => {
-        try {
             // Get email and password
             const { email, password } = req.body;
             const strQry = `
@@ -121,9 +120,18 @@ app.post('/login', bodyParser.json(),
             db.query(strQry, async (err, results) => {
 
                 if (err) throw err;
-
-                switch (true) {
-                    case (await compare(password, results[0].password)):
+                if (results.length === 0) {
+                    res.json({
+                        status: 400,
+                        msg: "Email not found."
+                    })
+                } else {
+                    if (await compare(password, results[0].password) == false) {
+                        res.json({
+                            status: 400,
+                            msg: "Password is incorrect."
+                        })
+                    } else {
                         jwt.sign(JSON.stringify(results[0]), process.env.secret, (err, token) => {
                             if (err) throw err;
                             res.json({
@@ -132,365 +140,324 @@ app.post('/login', bodyParser.json(),
                                 token: token
                             })
                         });
-                        break
-                    default:
+                    }
+                }
+
+            });
+        });
+
+            // get all users
+            router.get('/users', (req, res) => {
+                // mySQl query 
+                const strQry = `SELECT * FROM users`;
+
+                db.query(strQry, (err, results) => {
+                    if (err) {
                         res.json({
                             status: 400,
-                            msg: "Email/Password is incorrect. Please try again."
+                            results: err,
+                            msg: "Getting users failed"
                         })
-                }
-            })
-        } catch (e) {
-            console.log(`From login: ${e.message}`);
-        }
-    });
+                    } else {
+                        res.json({
+                            status: 200,
+                            results: results,
+                            msg: "Getting users successfull"
+                        })
+                    }
+                })
+            });
 
-// get all users
-router.get('/users', (req, res) => {
-    // mySQl query 
-    const strQry = `SELECT * FROM users`;
-
-    db.query(strQry, (err, results) => {
-        if (err) {
-            res.json({
-                status: 400,
-                results: err,
-                msg: "Getting users failed"
-            })
-        } else {
-            res.json({
-                status: 200,
-                results: results,
-                msg: "Getting users successfull"
-            })
-        }
-    })
-});
-
-// get 1 user
-router.get('/users/:id', (req, res) => {
-    // mySQL query
-    const strQry =
-        `
+            // get 1 user
+            router.get('/users/:id', (req, res) => {
+                // mySQL query
+                const strQry =
+                    `
 SELECT * FROM users WHERE id = ?;    
     `;
 
-    db.query(strQry, [req.params.id], (err, results) => {
-        if (err) 
-        res.json({
-            status: 400,
-            results: `${err}`
-        });
-        res.json({
-            status: 200,
-            results: (results.length <= 0) ? 'Sorry no product was found.' : results
-        })
-    })
-});
+                db.query(strQry, [req.params.id], (err, results) => {
+                    if (err)
+                        res.json({
+                            status: 400,
+                            results: `${err}`
+                        });
+                    res.json({
+                        status: 200,
+                        results: (results.length <= 0) ? 'Sorry no product was found.' : results
+                    })
+                })
+            });
 
-// delete user
-app.delete('/users/:id', (req, res) => {
-    // mySQL query
-    const strQry =
-        `
+            // delete user
+            app.delete('/users/:id', (req, res) => {
+                // mySQL query
+                const strQry =
+                    `
     DELETE FROM users WHERE id = ?;
     ALTER TABLE users AUTO_INCREMENT = 1;
     `;
 
-    db.query(strQry, [req.params.id], (err, results) => {
-        if (err)
-            res.json({
-                status: 400,
-                msg: `${err}`
-            })
-                ;
-        // else
-        res.json({
-            status: 200,
-            msg: `Deleted Successfully`
-        });
-    });
-});
-
-// Update user
-router.put("/users/:id", bodyParser.json(), async (req, res) => {
-    const { fullName, email, gender, dateOfBirth, phoneNO, userRole, password } = req.body;
-    let sql = `UPDATE users SET ? WHERE id = ${req.params.id} `;
-    const user = {
-        fullName, email, gender, dateOfBirth, phoneNO, userRole, password
-    };
-    db.query(sql, user, (err) => {
-        if (err) {
-            res.json({
-                status: 400,
-                msg: "Edit Failed.",
+                db.query(strQry, [req.params.id], (err, results) => {
+                    if (err)
+                        res.json({
+                            status: 400,
+                            msg: `${err}`
+                        })
+                            ;
+                    // else
+                    res.json({
+                        status: 200,
+                        msg: `Deleted Successfully`
+                    });
+                });
             });
-        } else {
-            res.json({
-                status: 200,
-                msg: "Edit Successfull.",
-            });
-        }
-    });
-});
 
-// ___________________________
-//   PRODUCTS
-
-// create product
-app.post('/products', bodyParser.json(),
-    (req, res) => {
-        try {
-
-            const { Prod_name, category, price, description, img1, img2, dateAdded } = req.body;
-
-            //     // mySQL query
-            const strQry =
-                `
-    INSERT INTO products (Prod_name, category, price, description, img1, img2, dateAdded) values (?, ?, ?, ?, ?, ? , NOW())
-    `;
-            //
-            db.query(strQry,
-                [Prod_name, category, price, description, img1, img2, dateAdded],
-                (err, results) => {
+            // Update user
+            router.put("/users/:id", bodyParser.json(), async (req, res) => {
+                const { fullName, email, gender, dateOfBirth, phoneNO, userRole, password } = req.body;
+                let sql = `UPDATE users SET ? WHERE id = ${req.params.id} `;
+                const user = {
+                    fullName, email, gender, dateOfBirth, phoneNO, userRole, password
+                };
+                db.query(sql, user, (err) => {
                     if (err) {
                         res.json({
                             status: 400,
-                            msg: `Product create failed ${err}`,
+                            msg: "Edit Failed.",
                         });
                     } else {
                         res.json({
                             status: 200,
-                            msg: "Product create Successfull",
+                            msg: "Edit Successfull.",
                         });
                     }
-
-                })
-        } catch (e) {
-            res.json({
-                status: 400,
-                msg: "Product create failed",
+                });
             });
-        }
-    });
 
-// get all products
-router.get('/products', (req, res) => {
-    // mysql query
-    const strQry = `
+            // ___________________________
+            //   PRODUCTS
+
+            // create product
+            app.post('/products', bodyParser.json(),
+                (req, res) => {
+                    try {
+
+                        const { Prod_name, category, price, description, img1, img2, dateAdded } = req.body;
+
+                        //     // mySQL query
+                        const strQry =
+                            `
+    INSERT INTO products (Prod_name, category, price, description, img1, img2, dateAdded) values (?, ?, ?, ?, ?, ? , NOW())
+    `;
+                        //
+                        db.query(strQry,
+                            [Prod_name, category, price, description, img1, img2, dateAdded],
+                            (err, results) => {
+                                if (err) {
+                                    res.json({
+                                        status: 400,
+                                        msg: `Product create failed ${err}`,
+                                    });
+                                } else {
+                                    res.json({
+                                        status: 200,
+                                        msg: "Product create Successfull",
+                                    });
+                                }
+
+                            })
+                    } catch (e) {
+                        res.json({
+                            status: 400,
+                            msg: "Product create failed",
+                        });
+                    }
+                });
+
+            // get all products
+            router.get('/products', (req, res) => {
+                // mysql query
+                const strQry = `
     SELECT * from products;
     `;
 
-    // error controll
-    db.query(strQry, (err, results) => {
-        if (err) throw err;
-        res.json({
-            status: 200,
-            results: results
-        })
-        console.log(err)
-    })
+                // error controll
+                db.query(strQry, (err, results) => {
+                    if (err) throw err;
+                    res.json({
+                        status: 200,
+                        results: results
+                    })
+                    console.log(err)
+                })
 
-});
+            });
 
-// get 1 product
-router.get('/products/:id', (req, res) => {
-    // mysql query
-    const strQry = `
+            // get 1 product
+            router.get('/products/:id', (req, res) => {
+                // mysql query
+                const strQry = `
      SELECT * from products where Prod_id = ?;
      `;
 
-    // error controll
-    db.query(strQry, [req.params.id], (err, results) => {
-        if (err)   res.json({
-            status: 400,
-            results: `${err}`
-        });
-        res.json({
-            status: 200,
-            results: (results.length <= 0) ? 'Sorry no product was found.' : results
-        })
-    });
+                // error controll
+                db.query(strQry, [req.params.id], (err, results) => {
+                    if (err) res.json({
+                        status: 400,
+                        results: `${err}`
+                    });
+                    res.json({
+                        status: 200,
+                        results: (results.length <= 0) ? 'Sorry no product was found.' : results
+                    })
+                });
 
-});
+            });
 
-// Delete product
-app.delete("/products/:id", (req, res) => {
-    // QUERY
-    const strQry = `
+            // Delete product
+            app.delete("/products/:id", (req, res) => {
+                // QUERY
+                const strQry = `
     DELETE FROM products
     WHERE Prod_id = ?;
     ALTER TABLE products AUTO_INCREMENT = 1;
     `;
-    db.query(strQry, [req.params.id], (err, data) => {
-        if (err)
-            res.json({
-                status: 400,
-                msg: `${err}`
-            })
-                ;
-        // else
-        res.json({
-            status: 200,
-            msg: `${data.affectedRows} PRODUCT/S WAS DELETED`
-        });
-    });
-});
-
-// Update product
-router.put("/products/:id", bodyParser.json(), async (req, res) => {
-    const { Prod_name, category, price, description, img1, img2 } = req.body;
-    // mySQL query
-    let sql = "UPDATE products SET ? WHERE Prod_id = ? ";
-
-    const product = {
-        Prod_name, category, price, description, img1, img2
-    };
-
-    db.query(sql, [product, req.params.id], (err) => {
-        if (err) {
-            res.status(400).json({
-                msg: "Updated product failed",
-            });
-        } else {
-            res.status(200).json({
-                msg: "Updated product successfull",
-            });
-        }
-
-    });
-});
-
-// CART
-
-// add to cart
-router.post('/users/:id/cart', bodyParser.json(), (req, res) => {
-
-    // mySQL query
-    let cart = `SELECT cart FROM users WHERE id = ${req.params.id};`;
-    // function
-    db.query(cart, (err, results) => {
-        if (err) throw err
-        if (results.length > 0) {
-            let cart;
-            if (results[0].cart == null) {
-                cart = []
-            } else {
-                cart = JSON.parse(results[0].cart)
-            }
-
-            let { Prod_id } = req.body;
-            // mySQL query
-            let product = `Select * FROM products WHERE Prod_id = ?`;
-            // function
-            db.query(product, Prod_id, (err, productData) => {
-                if (err) res.send(`${err}`)
-                let data = {
-                    cart_id: cart.length + 1,
-                    productData
-                }
-                cart.push(data)
-                console.log(cart);
-                let updateCart = `UPDATE users SET cart = ? WHERE id = ${req.params.id}`
-                db.query(updateCart, JSON.stringify(cart), (err, results) => {
-                    if (err) res.json({
-                        status: 400,
-                        msg:`${err}`})
+                db.query(strQry, [req.params.id], (err, data) => {
+                    if (err)
+                        res.json({
+                            status: 400,
+                            msg: `${err}`
+                        })
+                            ;
+                    // else
                     res.json({
                         status: 200,
-                        cart: results
-                    })
-                })
-            })
-        }
-    })
-});
+                        msg: `${data.affectedRows} PRODUCT/S WAS DELETED`
+                    });
+                });
+            });
 
-// get all cart data
-router.get("/users/:id/cart", (req, res) => {
-    // Query
-    const strQry = `
+            // Update product
+            router.put("/products/:id", bodyParser.json(), async (req, res) => {
+                const { Prod_name, category, price, description, img1, img2 } = req.body;
+                // mySQL query
+                let sql = "UPDATE products SET ? WHERE Prod_id = ? ";
+
+                const product = {
+                    Prod_name, category, price, description, img1, img2
+                };
+
+                db.query(sql, [product, req.params.id], (err) => {
+                    if (err) {
+                        res.status(400).json({
+                            msg: "Updated product failed",
+                        });
+                    } else {
+                        res.status(200).json({
+                            msg: "Updated product successfull",
+                        });
+                    }
+
+                });
+            });
+
+            // CART
+
+            // add to cart
+            router.post('/users/:id/cart', bodyParser.json(), (req, res) => {
+
+                // mySQL query
+                let cart = `SELECT cart FROM users WHERE id = ${req.params.id};`;
+                // function
+                db.query(cart, (err, results) => {
+                    if (err) throw err
+                    if (results.length > 0) {
+                        let cart;
+                        if (results[0].cart == null) {
+                            cart = []
+                        } else {
+                            cart = JSON.parse(results[0].cart)
+                        }
+
+                        let { Prod_id } = req.body;
+                        // mySQL query
+                        let product = `Select * FROM products WHERE Prod_id = ?`;
+                        // function
+                        db.query(product, Prod_id, (err, productData) => {
+                            if (err) res.send(`${err}`)
+                            let data = {
+                                cart_id: cart.length + 1,
+                                productData
+                            }
+                            cart.push(data)
+                            console.log(cart);
+                            let updateCart = `UPDATE users SET cart = ? WHERE id = ${req.params.id}`
+                            db.query(updateCart, JSON.stringify(cart), (err, results) => {
+                                if (err) res.json({
+                                    status: 400,
+                                    msg: `${err}`
+                                })
+                                res.json({
+                                    status: 200,
+                                    cart: results
+                                })
+                            })
+                        })
+                    }
+                })
+            });
+
+            // get all cart data
+            router.get("/users/:id/cart", (req, res) => {
+                // Query
+                const strQry = `
     SELECT *
     FROM users
     WHERE id = ?;
     `;
-    db.query(strQry, [req.params.id], (err, results) => {
-        if (err) 
-        res.json({
-            status: 400,
-            results: `${err}`,
-        });;
-        res.json({
-            status: 200,
-            results: JSON.parse(results[0].cart),
-        });
-    });
-});
+                db.query(strQry, [req.params.id], (err, results) => {
+                    if (err)
+                        res.json({
+                            status: 400,
+                            results: `${err}`,
+                        });;
+                    res.json({
+                        status: 200,
+                        results: JSON.parse(results[0].cart),
+                    });
+                });
+            });
 
-// get single cart data
-router.get("/users/:id/cart/:cartId", (req, res) => {
-    // Query
-    const strQry = `
+            // get single cart data
+            router.get("/users/:id/cart/:cartId", (req, res) => {
+                // Query
+                const strQry = `
         SELECT *
         FROM users
         WHERE id = ?;
         `;
-    db.query(strQry, [req.params.id], (err, results) => {
-        if (err) throw err;
-        let cartResults = JSON.parse(results[0].cart);
-        res.json({
-            status: 200,
-            results: cartResults.filter((item) => {
-                return item.cart_id == req.params.cartId
-            }),
-        });
-    });
-});
+                db.query(strQry, [req.params.id], (err, results) => {
+                    if (err) throw err;
+                    let cartResults = JSON.parse(results[0].cart);
+                    res.json({
+                        status: 200,
+                        results: cartResults.filter((item) => {
+                            return item.cart_id == req.params.cartId
+                        }),
+                    });
+                });
+            });
 
-// delete all cart data
-router.delete("/users/:id/cart", (req, res) => {
-    // Query
-    const strQry = `
+            // delete all cart data
+            router.delete("/users/:id/cart", (req, res) => {
+                // Query
+                const strQry = `
     UPDATE users
     SET cart=null
     WHERE id=?
     `;
-    db.query(strQry, [req.params.id], (err, results) => {
-        if (err)
-            res.json({
-                status: 400,
-                msg: `${err}`
-            });
-        // else
-        res.json({
-            status: 200,
-            msg: "Cart cleared."
-        });
-    });
-});
-
-// delete single cart data
-router.delete('/users/:id/cart/:cartId', (req, res) => {
-    const delSingleCartId = `
-        SELECT cart FROM users
-        WHERE id = ${req.params.id}
-    `
-    db.query(delSingleCartId, (err, results) => {
-        if (err) throw err;
-        if (results.length > 0) {
-            if (results[0].cart != null) {
-                const result = JSON.parse(results[0].cart).filter((cart) => {
-                    return cart.cart_id != req.params.cartId;
-                })
-                result.forEach((cart, i) => {
-                    cart.cart_id = i + 1
-                });
-                const query = `
-                    UPDATE users
-                    SET cart = ?
-                    WHERE id = ${req.params.id}
-                `
-                db.query(query, [JSON.stringify(result)], (err, results) => {
+                db.query(strQry, [req.params.id], (err, results) => {
                     if (err)
                         res.json({
                             status: 400,
@@ -499,20 +466,55 @@ router.delete('/users/:id/cart/:cartId', (req, res) => {
                     // else
                     res.json({
                         status: 200,
-                        result: "Successfully deleted item from cart"
+                        msg: "Cart cleared."
                     });
-                })
-            } else {
-                res.json({
-                    status: 400,
-                    result: "This user has an empty cart"
-                })
-            }
-        } else {
-            res.json({
-                status: 400,
-                result: "There is no user with that id"
+                });
             });
-        }
-    })
-})
+
+            // delete single cart data
+            router.delete('/users/:id/cart/:cartId', (req, res) => {
+                const delSingleCartId = `
+        SELECT cart FROM users
+        WHERE id = ${req.params.id}
+    `
+                db.query(delSingleCartId, (err, results) => {
+                    if (err) throw err;
+                    if (results.length > 0) {
+                        if (results[0].cart != null) {
+                            const result = JSON.parse(results[0].cart).filter((cart) => {
+                                return cart.cart_id != req.params.cartId;
+                            })
+                            result.forEach((cart, i) => {
+                                cart.cart_id = i + 1
+                            });
+                            const query = `
+                    UPDATE users
+                    SET cart = ?
+                    WHERE id = ${req.params.id}
+                `
+                            db.query(query, [JSON.stringify(result)], (err, results) => {
+                                if (err)
+                                    res.json({
+                                        status: 400,
+                                        msg: `${err}`
+                                    });
+                                // else
+                                res.json({
+                                    status: 200,
+                                    result: "Successfully deleted item from cart"
+                                });
+                            })
+                        } else {
+                            res.json({
+                                status: 400,
+                                result: "This user has an empty cart"
+                            })
+                        }
+                    } else {
+                        res.json({
+                            status: 400,
+                            result: "There is no user with that id"
+                        });
+                    }
+                })
+            })
